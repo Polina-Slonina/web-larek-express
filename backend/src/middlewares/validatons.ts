@@ -1,8 +1,44 @@
 import { Request, Response, NextFunction } from 'express';
 import validator from 'validator';
+import { Joi } from 'celebrate';
 import product from '../models/product';
 import BadRequestError from '../errors/bad-request-error';
 import NotFoundError from '../errors/not-found-error';
+
+export const validateProduct = {
+  body: Joi.object({
+    title: Joi.string().min(2).max(30).required(),
+    image: Joi.object({
+      fileName: Joi.string().required(),
+      originalName: Joi.string().required()
+    }).required(),
+    category: Joi.string().required(),
+    description: Joi.string().optional(),
+    price: Joi.number().allow(null).optional().default(null)
+  })
+};
+
+export const validateOrder = {
+  body: Joi.object({
+    payment: Joi.string().valid('card', 'online').required(),
+    email: Joi.string().email().required(),
+    phone: Joi.string().required(),
+    address: Joi.string().required(),
+    total: Joi.number().positive().required(),
+    items: Joi.array().items(Joi.string().hex().length(24)).min(1).required()
+  })
+};
+
+export const validateObjectId = {
+  params: Joi.object({
+    id: Joi.string().hex().length(24).required()
+      .messages({
+        'string.hex': 'Неверный формат идентификатора',
+        'string.length': 'Неверный формат идентификатора',
+        'any.required': 'Идентификатор обязателен'
+      })
+  })
+};
 
 // Валидация обязательных полей
 export const validateRequiredFields = (req: Request, res: Response, next: NextFunction) => {

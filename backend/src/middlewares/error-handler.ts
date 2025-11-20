@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Error as MongooseError } from 'mongoose';
+import { isCelebrateError } from 'celebrate';
 import NotFoundError from '../errors/not-found-error';
 import BadRequestError from '../errors/bad-request-error';
 import ConflictError from '../errors/conflict-error';
@@ -10,7 +11,21 @@ export const errorHandler = (
   res: Response,
   _next: NextFunction,
 ) => {
-  // Если это кастомная ошибка (имеет statusCode)
+  // Если ошибка от celebrate
+  if (isCelebrateError(error)) {
+    let errorMessage = 'Ошибка валидации данных';
+
+    const errorSource = error.details.get('body') || error.details.get('params') || error.details.get('query') || error.details.get('headers');
+
+    if (errorSource) {
+      errorMessage = errorSource.message;
+    }
+
+    return res.status(400).json({
+      message: errorMessage
+    });
+  }
+
   // Если это наши кастомные ошибки
   if (error instanceof NotFoundError) {
     return res.status(error.statusCode).json({
@@ -29,6 +44,13 @@ export const errorHandler = (
       message: error.message,
     });
   }
+
+  // // Обработка ошибок CastError (неверный формат ID)
+  // if (error instanceof MongooseError.CastError) {
+  //   return res.status(400).json({
+  //     message: 'Неверный формат идентификатора'
+  //   });
+  // }
 
   // Обработка ошибок Mongoose ValidationError
   if (error instanceof MongooseError.ValidationError) {

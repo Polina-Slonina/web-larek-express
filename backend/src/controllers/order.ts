@@ -13,7 +13,9 @@ export const createOrder = async (_req: Request, res: Response, next: NextFuncti
       total: calculatedTotal,
     });
   } catch (error) {
-   // Любая непредвиденная ошибка передается в централизованный обработчик
-    return next(error); //500 подумать
+    // Любая непредвиденная ошибка передается в централизованный обработчик
+    return next(error);
   }
 };
+
+export default createOrder;

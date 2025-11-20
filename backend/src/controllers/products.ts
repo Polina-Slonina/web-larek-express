@@ -29,7 +29,14 @@ export const createProduct = (req: Request, res: Response, next: NextFunction) =
     return next(new BadRequestError('Поля image.fileName и image.originalName обязательны'));
   }
   return product.create({
-    title, image, category, description, price,
+    title: title?.trim(),
+    image: {
+      fileName: image?.fileName?.trim(),
+      originalName: image?.originalName?.trim(),
+    },
+    category: category?.trim(),
+    description: description?.trim() || '',
+    price: price || null,
   })
     .then((createdProduct) => res.status(201).send({
       items: [createdProduct],
@@ -43,11 +50,11 @@ export const createProduct = (req: Request, res: Response, next: NextFunction) =
 
       // Ошибки валидации Mongoose
       if (error.name === 'ValidationError') {
-        const errors = Object.values(error.errors).map((err: any) => err.message);
+        // const errors = Object.values(error.errors).map((err: any) => err.message);
         return next(new BadRequestError('Ошибка валидации данных при создании товара'));
       }
 
-    // Все остальные ошибки передаем в централизованный обработчик
-    return next(error);
+      // Все остальные ошибки передаем в централизованный обработчик
+      return next(error);
     });
 };

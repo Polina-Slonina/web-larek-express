@@ -6,7 +6,9 @@ import path from 'path';
 // import productRouter from './routes/product';
 // import orderRoutes from './routes/order';
 import router from './routes/index';
+import { errors } from 'celebrate';
 import {errorHandler, notFoundHandler} from './middlewares/error-handler';
+import { errorLogger, requestLogger } from './middlewares/logger';
 
 dotenv.config();
 
@@ -18,17 +20,25 @@ const MONGODB_URI = process.env.DB_ADDRESS;
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));  
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(requestLogger);
 
 app.use('/', router);
 // app.use('/product', productRouter);
 // app.use('/', orderRoutes);
 
+// Валидация celebrate
+app.use(errors());
+
+// Логгер ошибок подключается ПОСЛЕ обработчиков роутов, но ДО обработчиков ошибок
+app.use(errorLogger);
+
 // Обработка 404 ошибок - после всех роутов
 app.use('*', notFoundHandler);
 
-// Централизованный обработчик ошибок - самый последний
+// Централизованный обработчик ошибок
 app.use(errorHandler);
 
 // Подключение к MongoDB
