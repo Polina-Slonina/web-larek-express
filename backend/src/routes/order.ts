@@ -8,7 +8,7 @@ import {
   validateProductsAvailable,
   validateOrderTotal,
   validateOrder,
-} from '../middlewares/validatons';
+} from '../middlewares/validations';
 
 const orderRouter = Router();
 

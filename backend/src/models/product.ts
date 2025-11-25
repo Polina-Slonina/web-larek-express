@@ -1,4 +1,6 @@
-import mongoose from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
+import fs from 'fs';
+import path from 'path';
 
 interface IProduct {
   title: string;
@@ -32,7 +34,7 @@ export const productSchema = new mongoose.Schema<IProduct>({
   },
   category: {
     type: String,
-    required: [true, 'Категория товара обязательна'],
+    required: true,
   },
   description: {
     type: String,
@@ -43,8 +45,20 @@ export const productSchema = new mongoose.Schema<IProduct>({
     required: false,
     default: null,
   },
-}, {
-  timestamps: true, // Добавляет поля createdAt и updatedAt
+});
+
+// Middleware для удаления файлов изображений при удалении товара
+productSchema.post('findOneAndDelete', async function(doc: IProduct) {
+  if (doc && doc.image && doc.image.fileName) {
+    try {
+      const filePath = path.join(__dirname, '..', 'uploads', doc.image.fileName);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    } catch (error) {
+      console.error('Ошибка при удалении файла изображения:', error);
+    }
+  }
 });
 
 // Создание и экспорт модели

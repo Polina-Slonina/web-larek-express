@@ -32,13 +32,24 @@ export const validateOrder = {
 export const validateObjectId = {
   params: Joi.object({
     id: Joi.string().hex().length(24).required()
-      .messages({
-        'string.hex': 'Неверный формат идентификатора',
-        'string.length': 'Неверный формат идентификатора',
-        'any.required': 'Идентификатор обязателен'
-      })
   })
 };
+
+export const validateLogin = {
+  body: Joi.object({
+    email: Joi.string().email().required(),
+    password: Joi.string().min(6).required(),
+  }),
+};
+
+export const validateRegister = {
+  body: Joi.object({
+    name: Joi.string().min(2).max(30).optional(),
+    email: Joi.string().email().required(),
+    password: Joi.string().min(6).required(),
+  }),
+};
+
 
 // Валидация обязательных полей
 export const validateRequiredFields = (req: Request, res: Response, next: NextFunction) => {
@@ -59,7 +70,7 @@ export const validateRequiredFields = (req: Request, res: Response, next: NextFu
     total,
     items,
   };
-  const missingField = Object.entries(requiredFields)
+  const checkingRequiredField = Object.entries(requiredFields)
     .find(([_field, value]) => {
       if (value === undefined || value === null || value === '') {
         return true;
@@ -67,8 +78,8 @@ export const validateRequiredFields = (req: Request, res: Response, next: NextFu
       return false;
     });
 
-  if (missingField) {
-    return next(new BadRequestError(`Поле ${missingField[0]} обязательно для заполнения`));
+  if (checkingRequiredField) {
+    return next(new BadRequestError(`Поле ${checkingRequiredField[0]} обязательно для заполнения`));
   }
 
   return next();
@@ -92,7 +103,7 @@ export const validateDataTypes = (req: Request, res: Response, next: NextFunctio
 
   // Валидация email
   if (!validator.isEmail(email)) {
-     return next(new BadRequestError('Ошибка валидации данных'));
+    return next(new BadRequestError('Ошибка валидации данных'));
   }
 
   // Валидация phone

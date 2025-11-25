@@ -4,6 +4,7 @@ import { isCelebrateError } from 'celebrate';
 import NotFoundError from '../errors/not-found-error';
 import BadRequestError from '../errors/bad-request-error';
 import ConflictError from '../errors/conflict-error';
+import UnauthorizedError from '../errors/unauthorized-error';
 
 export const errorHandler = (
   error: Error,
@@ -22,11 +23,11 @@ export const errorHandler = (
     }
 
     return res.status(400).json({
-      message: errorMessage
+      message: errorMessage,
     });
   }
 
-  // Если это наши кастомные ошибки
+  // Если кастомные ошибки
   if (error instanceof NotFoundError) {
     return res.status(error.statusCode).json({
       message: error.message,
@@ -45,12 +46,11 @@ export const errorHandler = (
     });
   }
 
-  // // Обработка ошибок CastError (неверный формат ID)
-  // if (error instanceof MongooseError.CastError) {
-  //   return res.status(400).json({
-  //     message: 'Неверный формат идентификатора'
-  //   });
-  // }
+  if (error instanceof UnauthorizedError) {
+    return res.status(error.statusCode).json({
+      message: error.message,
+    });
+  }
 
   // Обработка ошибок Mongoose ValidationError
   if (error instanceof MongooseError.ValidationError) {
@@ -73,8 +73,7 @@ export const errorHandler = (
     });
   }
 
-  // Все остальные ошибки (включая обычные Error) - 500
-  // console.error('Внутренняя ошибка сервера:', error);
+  // Все остальные ошибки (включая Error) - 500
   return res.status(500).json({
     message: 'Внутренняя ошибка сервера',
   });

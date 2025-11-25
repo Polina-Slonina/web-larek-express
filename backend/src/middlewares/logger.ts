@@ -1,4 +1,3 @@
-// middlewares/logger.ts
 import winston from 'winston';
 import expressWinston from 'express-winston';
 
@@ -8,9 +7,9 @@ export const requestLogger = expressWinston.logger({
     new winston.transports.File({ filename: 'request.log' }),
   ],
   format: winston.format.json(),
-  meta: true, // включаем мета-информацию
+  meta: true,
   msg: 'HTTP {{req.method}} {{req.url}}', // формат сообщения
-  expressFormat: true, // используем формат Express
+  expressFormat: true, // формат Express
   colorize: false, // отключаем цвета для файлов
   ignoreRoute: (_req, _res) => false, // логируем все роуты
 });
