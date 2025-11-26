@@ -1,0 +1,9 @@
+export const {
+  ACCESS_TOKEN_EXPIRY  = '1m',
+  REFRESH_TOKEN_EXPIRY = '7d',
+  ACCESS_TOKEN_SECRET = 'access-secret-key',
+  REFRESH_TOKEN_SECRET = 'refresh-secret-key',
+  MONGODB_URI = 'mongodb://127.0.0.1:27017/weblarek',
+  PORT = '3000',
+  NODE_ENV = 'development'
+} = process.env;

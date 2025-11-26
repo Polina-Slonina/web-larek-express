@@ -4,18 +4,13 @@ import User from '../models/user';
 import BadRequestError from '../errors/bad-request-error';
 import UnauthorizedError from '../errors/unauthorized-error';
 import NotFoundError from '../errors/not-found-error';
-import ConflictError from '../errors/conflict-error';
+import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY  } from '../config';
 
 const ms = require('ms')
 
 export interface TokenPayload {
   _id: string;
 }
-
-const ACCESS_TOKEN_EXPIRY = process.env.AUTH_ACCESS_TOKEN_EXPIRY || '1m';
-const REFRESH_TOKEN_EXPIRY = process.env.AUTH_REFRESH_TOKEN_EXPIRY || '7d';
-const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || 'refresh-secret-key';
-const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || 'access-secret-key';
 
 // Генерация токенов
 const generateTokens = (userId: string): { accessToken: string; refreshToken: string } => {
@@ -108,12 +103,6 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { name, email, password } = req.body;
-
-    // Проверяем, существует ли пользователь
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return next(new ConflictError('Пользователь с таким email уже существует'));
-    }
 
     // Создаем пользователя
     const user = await User.create({

@@ -8,14 +8,12 @@ import router from './routes/index';
 import { errors } from 'celebrate';
 import {errorHandler, notFoundHandler} from './middlewares/error-handler';
 import { errorLogger, requestLogger } from './middlewares/logger';
-import cleanupTempFiles from './controllers/cleanupTempFiles';
+import cleanupTempFiles from './utils/cleanupTempFiles';
+import { PORT, MONGODB_URI  } from './config';
 
 dotenv.config();
 
 const app = express();
-
-const PORT = process.env.PORT || 3000;
-const MONGODB_URI = process.env.DB_ADDRESS;
 
 const corsOptions = {
   origin: ['http://localhost:3000', 'http://localhost:5173'],
