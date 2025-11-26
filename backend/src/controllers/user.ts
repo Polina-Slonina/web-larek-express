@@ -10,12 +10,6 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
   try {
     const { name, email, password } = req.body;
 
-    // Проверяем, существует ли пользователь с таким email
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return next(new ConflictError('Пользователь с таким email уже существует'));
-    }
-
     // Создаем пользователя
     const user = await User.create({
       name: name || 'Ё-мое',

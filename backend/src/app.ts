@@ -40,11 +40,11 @@ app.use('/', router);
 // Валидация celebrate
 app.use(errors());
 
-// Логгер ошибок
-app.use(errorLogger);
-
 // Обработка 404 ошибок
 app.use('*', notFoundHandler);
+
+// Логгер ошибок
+app.use(errorLogger);
 
 // Централизованный обработчик ошибок
 app.use(errorHandler);
